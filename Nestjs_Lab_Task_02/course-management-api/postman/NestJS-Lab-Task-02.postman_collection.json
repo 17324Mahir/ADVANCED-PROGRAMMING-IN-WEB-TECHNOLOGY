@@ -1,0 +1,1116 @@
+{
+  "info": {
+    "_postman_id": "05340d7f-b5b2-4cab-b97c-36a8391ad07d",
+    "name": "NestJS Lab Task 02",
+    "description": "Lab Task 02 steps 11\u201313: six JSON routes, nine validation failures, numeric-string conversion, four accepted file extensions, and four upload failures. Run the API on localhost:3000. Generate local fixtures with node postman/generate-fixtures.mjs; use the printed directory as the working directory. See postman/README.md. Successful course responses are examples and do not persist course data.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "courseId",
+      "value": "5",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 JSON routes",
+      "item": [
+        {
+          "name": "GET all courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/course"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Response matches the required JSON shape\", function () {",
+                  "  pm.expect(json).to.deep.equal({\"message\": \"All courses fetched successfully\", \"data\": []});",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET course by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/course/{{courseId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Response matches the required JSON shape\", function () {",
+                  "  pm.expect(json).to.deep.equal({\"message\": \"Course fetched successfully\", \"id\": pm.variables.get(\"courseId\")});",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST create course",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/course",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"NestJS Fundamentals\",\n  \"code\": \"CS101\",\n  \"instructor\": \"John Doe\",\n  \"credits\": 3,\n  \"description\": \"Introduction to NestJS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Response matches the required JSON shape\", function () {",
+                  "  pm.expect(json).to.deep.equal({\"message\": \"Course created successfully\", \"data\": {\"name\": \"NestJS Fundamentals\", \"code\": \"CS101\", \"instructor\": \"John Doe\", \"credits\": 3, \"description\": \"Introduction to NestJS\"}});",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "PUT update course",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/course/{{courseId}}",
+            "description": "PartialType permits omitted properties for PUT, as required by the lab.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"NestJS Advanced\",\n  \"code\": \"CS201\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Response matches the required JSON shape\", function () {",
+                  "  pm.expect(json).to.deep.equal({\"message\": \"Course updated successfully\", \"id\": pm.variables.get(\"courseId\"), \"data\": {\"name\": \"NestJS Advanced\", \"code\": \"CS201\"}});",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "PATCH partial course update",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/course/{{courseId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"NestJS Advanced\",\n  \"credits\": 4\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Response matches the required JSON shape\", function () {",
+                  "  pm.expect(json).to.deep.equal({\"message\": \"Course patched successfully\", \"id\": pm.variables.get(\"courseId\"), \"updatedFields\": [\"name\", \"credits\"]});",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "DELETE course",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/course/{{courseId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Response matches the required JSON shape\", function () {",
+                  "  pm.expect(json).to.deep.equal({\"message\": \"Course deleted successfully\", \"id\": pm.variables.get(\"courseId\")});",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 DTO validation and transformation",
+      "item": [
+        {
+          "name": "Empty name",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/course",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"code\": \"CS101\",\n  \"instructor\": \"John Doe\",\n  \"credits\": 3,\n  \"description\": \"Introduction to NestJS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Bad Request response\", function () {",
+                  "  pm.expect(json.statusCode).to.equal(400);",
+                  "  pm.expect(json.error).to.equal(\"Bad Request\");",
+                  "});",
+                  "pm.test(\"Response explains the validation failure\", function () {",
+                  "  pm.expect(json.message).to.be.an(\"array\");",
+                  "  pm.expect(json.message.join(\"\\n\")).to.include(\"name should not be empty\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Blank name",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/course",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"   \",\n  \"code\": \"CS101\",\n  \"instructor\": \"John Doe\",\n  \"credits\": 3,\n  \"description\": \"Introduction to NestJS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Bad Request response\", function () {",
+                  "  pm.expect(json.statusCode).to.equal(400);",
+                  "  pm.expect(json.error).to.equal(\"Bad Request\");",
+                  "});",
+                  "pm.test(\"Response explains the validation failure\", function () {",
+                  "  pm.expect(json.message).to.be.an(\"array\");",
+                  "  pm.expect(json.message.join(\"\\n\")).to.include(\"name should not be blank\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Too many credits",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/course",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"NestJS Fundamentals\",\n  \"code\": \"CS101\",\n  \"instructor\": \"John Doe\",\n  \"credits\": 10,\n  \"description\": \"Introduction to NestJS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Bad Request response\", function () {",
+                  "  pm.expect(json.statusCode).to.equal(400);",
+                  "  pm.expect(json.error).to.equal(\"Bad Request\");",
+                  "});",
+                  "pm.test(\"Response explains the validation failure\", function () {",
+                  "  pm.expect(json.message).to.be.an(\"array\");",
+                  "  pm.expect(json.message.join(\"\\n\")).to.include(\"credits must not be greater than 6\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Too few credits",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/course",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"NestJS Fundamentals\",\n  \"code\": \"CS101\",\n  \"instructor\": \"John Doe\",\n  \"credits\": 0,\n  \"description\": \"Introduction to NestJS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Bad Request response\", function () {",
+                  "  pm.expect(json.statusCode).to.equal(400);",
+                  "  pm.expect(json.error).to.equal(\"Bad Request\");",
+                  "});",
+                  "pm.test(\"Response explains the validation failure\", function () {",
+                  "  pm.expect(json.message).to.be.an(\"array\");",
+                  "  pm.expect(json.message.join(\"\\n\")).to.include(\"credits must not be less than 1\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Missing required fields",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/course",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Bad Request response\", function () {",
+                  "  pm.expect(json.statusCode).to.equal(400);",
+                  "  pm.expect(json.error).to.equal(\"Bad Request\");",
+                  "});",
+                  "pm.test(\"Response explains the validation failure\", function () {",
+                  "  pm.expect(json.message).to.be.an(\"array\");",
+                  "  pm.expect(json.message.join(\"\\n\")).to.include(\"name\");",
+                  "  pm.expect(json.message.join(\"\\n\")).to.include(\"code\");",
+                  "  pm.expect(json.message.join(\"\\n\")).to.include(\"instructor\");",
+                  "  pm.expect(json.message.join(\"\\n\")).to.include(\"credits\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Unknown property",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/course",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"NestJS Fundamentals\",\n  \"code\": \"CS101\",\n  \"instructor\": \"John Doe\",\n  \"credits\": 3,\n  \"description\": \"Introduction to NestJS\",\n  \"unexpected\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Bad Request response\", function () {",
+                  "  pm.expect(json.statusCode).to.equal(400);",
+                  "  pm.expect(json.error).to.equal(\"Bad Request\");",
+                  "});",
+                  "pm.test(\"Response explains the validation failure\", function () {",
+                  "  pm.expect(json.message).to.be.an(\"array\");",
+                  "  pm.expect(json.message.join(\"\\n\")).to.include(\"property unexpected should not exist\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Wrong text type",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/course",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"NestJS Fundamentals\",\n  \"code\": \"CS101\",\n  \"instructor\": 123,\n  \"credits\": 3,\n  \"description\": \"Introduction to NestJS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Bad Request response\", function () {",
+                  "  pm.expect(json.statusCode).to.equal(400);",
+                  "  pm.expect(json.error).to.equal(\"Bad Request\");",
+                  "});",
+                  "pm.test(\"Response explains the validation failure\", function () {",
+                  "  pm.expect(json.message).to.be.an(\"array\");",
+                  "  pm.expect(json.message.join(\"\\n\")).to.include(\"instructor must be a string\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Wrong numeric value",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/course",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"NestJS Fundamentals\",\n  \"code\": \"CS101\",\n  \"instructor\": \"John Doe\",\n  \"credits\": \"abc\",\n  \"description\": \"Introduction to NestJS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Bad Request response\", function () {",
+                  "  pm.expect(json.statusCode).to.equal(400);",
+                  "  pm.expect(json.error).to.equal(\"Bad Request\");",
+                  "});",
+                  "pm.test(\"Response explains the validation failure\", function () {",
+                  "  pm.expect(json.message).to.be.an(\"array\");",
+                  "  pm.expect(json.message.join(\"\\n\")).to.include(\"credits must be a number\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Invalid partial update",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/course/{{courseId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"credits\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Bad Request response\", function () {",
+                  "  pm.expect(json.statusCode).to.equal(400);",
+                  "  pm.expect(json.error).to.equal(\"Bad Request\");",
+                  "});",
+                  "pm.test(\"Response explains the validation failure\", function () {",
+                  "  pm.expect(json.message).to.be.an(\"array\");",
+                  "  pm.expect(json.message.join(\"\\n\")).to.include(\"credits must not be greater than 6\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Numeric string credits transform to a number",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/course",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"NestJS Fundamentals\",\n  \"code\": \"CS101\",\n  \"instructor\": \"John Doe\",\n  \"credits\": \"3\",\n  \"description\": \"Introduction to NestJS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Response matches the required JSON shape\", function () {",
+                  "  pm.expect(json).to.deep.equal({\"message\": \"Course created successfully\", \"data\": {\"name\": \"NestJS Fundamentals\", \"code\": \"CS101\", \"instructor\": \"John Doe\", \"credits\": 3, \"description\": \"Introduction to NestJS\"}});",
+                  "});",
+                  "pm.test(\"Credits were transformed to the number 3\", function () {",
+                  "  pm.expect(json.data.credits).to.be.a(\"number\");",
+                  "  pm.expect(json.data.credits).to.equal(3);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 Course material uploads",
+      "item": [
+        {
+          "name": "Upload valid PDF",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/course/{{courseId}}/upload",
+            "description": "Use the generated fixture with this name. Let Postman generate the multipart Content-Type header and boundary. Verify the returned filename also exists under src/uploads.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "fixtures/course-material.pdf"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Upload response identifies the saved material\", function () {",
+                  "  pm.expect(json).to.have.all.keys(\"message\", \"courseId\", \"filename\", \"path\");",
+                  "  pm.expect(json.message).to.equal(\"Material uploaded successfully\");",
+                  "  pm.expect(json.courseId).to.equal(pm.variables.get(\"courseId\"));",
+                  "  pm.expect(json.filename).to.match(/^\\d+-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\.pdf$/);",
+                  "  pm.expect(json.path).to.equal(\"src/uploads/\" + json.filename);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Upload valid JPG",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/course/{{courseId}}/upload",
+            "description": "Use the generated fixture with this name. Let Postman generate the multipart Content-Type header and boundary. Verify the returned filename also exists under src/uploads.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "fixtures/course-material.jpg"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Upload response identifies the saved material\", function () {",
+                  "  pm.expect(json).to.have.all.keys(\"message\", \"courseId\", \"filename\", \"path\");",
+                  "  pm.expect(json.message).to.equal(\"Material uploaded successfully\");",
+                  "  pm.expect(json.courseId).to.equal(pm.variables.get(\"courseId\"));",
+                  "  pm.expect(json.filename).to.match(/^\\d+-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\.jpg$/);",
+                  "  pm.expect(json.path).to.equal(\"src/uploads/\" + json.filename);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Upload valid JPEG",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/course/{{courseId}}/upload",
+            "description": "Use the generated fixture with this name. Let Postman generate the multipart Content-Type header and boundary. Verify the returned filename also exists under src/uploads.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "fixtures/course-material.jpeg"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Upload response identifies the saved material\", function () {",
+                  "  pm.expect(json).to.have.all.keys(\"message\", \"courseId\", \"filename\", \"path\");",
+                  "  pm.expect(json.message).to.equal(\"Material uploaded successfully\");",
+                  "  pm.expect(json.courseId).to.equal(pm.variables.get(\"courseId\"));",
+                  "  pm.expect(json.filename).to.match(/^\\d+-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\.jpeg$/);",
+                  "  pm.expect(json.path).to.equal(\"src/uploads/\" + json.filename);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Upload valid PNG",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/course/{{courseId}}/upload",
+            "description": "Use the generated fixture with this name. Let Postman generate the multipart Content-Type header and boundary. Verify the returned filename also exists under src/uploads.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "fixtures/course-material.png"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Upload response identifies the saved material\", function () {",
+                  "  pm.expect(json).to.have.all.keys(\"message\", \"courseId\", \"filename\", \"path\");",
+                  "  pm.expect(json.message).to.equal(\"Material uploaded successfully\");",
+                  "  pm.expect(json.courseId).to.equal(pm.variables.get(\"courseId\"));",
+                  "  pm.expect(json.filename).to.match(/^\\d+-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\.png$/);",
+                  "  pm.expect(json.path).to.equal(\"src/uploads/\" + json.filename);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Reject unsupported .txt",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/course/{{courseId}}/upload",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "fixtures/invalid.txt"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Bad Request response\", function () {",
+                  "  pm.expect(json.statusCode).to.equal(400);",
+                  "  pm.expect(json.error).to.equal(\"Bad Request\");",
+                  "});",
+                  "pm.test(\"Response explains the validation failure\", function () {",
+                  "  pm.expect(json.message).to.include(\"Only .jpg, .jpeg, .png and .pdf files are allowed\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Reject unsupported .exe",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/course/{{courseId}}/upload",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "fixtures/invalid.exe"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Bad Request response\", function () {",
+                  "  pm.expect(json.statusCode).to.equal(400);",
+                  "  pm.expect(json.error).to.equal(\"Bad Request\");",
+                  "});",
+                  "pm.test(\"Response explains the validation failure\", function () {",
+                  "  pm.expect(json.message).to.include(\"Only .jpg, .jpeg, .png and .pdf files are allowed\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Reject file larger than 2 MB",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/course/{{courseId}}/upload",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "fixtures/too-large.pdf"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Bad Request response\", function () {",
+                  "  pm.expect(json.statusCode).to.equal(400);",
+                  "  pm.expect(json.error).to.equal(\"Bad Request\");",
+                  "});",
+                  "pm.test(\"Response explains the validation failure\", function () {",
+                  "  pm.expect(json.message).to.include(\"File must be smaller than 2 MB\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Reject missing file",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/course/{{courseId}}/upload",
+            "description": "Intentionally send an upload request without a file.",
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response is a JSON object\", function () {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "  pm.expect(pm.response.json()).to.be.an(\"object\");",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Bad Request response\", function () {",
+                  "  pm.expect(json.statusCode).to.equal(400);",
+                  "  pm.expect(json.error).to.equal(\"Bad Request\");",
+                  "});",
+                  "pm.test(\"Response explains the validation failure\", function () {",
+                  "  pm.expect(json.message).to.include(\"File is required\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    }
+  ]
+}
